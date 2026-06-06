@@ -44,11 +44,11 @@ public class ResumeParserService {
             dto.setPhnNo(extractPhoneNumber(rawText));
             dto.setSkills(extractSkills(rawText));
             dto.setEducation(extractEducationDetails(resumeSections.get("EDUCATION")));
-            dto.setExperience(extractExperienceDetails(resumeSections.get("EXPERIENCE")));
+//            dto.setExperience(extractExperienceDetails(resumeSections.get("EXPERIENCE")));
             dto.setProjects(extractProjectsDetails(resumeSections.get("PROJECTS")));
             dto.setCertifications(extractCertifications(resumeSections.get("CERTIFICATIONS")));
             // Actually call the method and set the total experience!
-            dto.setTotalExperience(calculateTotalExperience(dto.getExperience()));
+//            dto.setTotalExperience(calculateTotalExperience(dto.getExperience()));
 
             ParsedResumeDTO saveOrExistingDTO=candidateClient.saveCandidate(dto);
             return saveOrExistingDTO;
@@ -245,150 +245,150 @@ public class ResumeParserService {
         list.add(edu);
     }
 
-    private List<ExperienceDTO> extractExperienceDetails(String experienceText) {
-        List<ExperienceDTO> experienceList = new ArrayList<>();
-        if (experienceText == null || experienceText.isEmpty()) {
-            return experienceList;
-        }
+//    private List<ExperienceDTO> extractExperienceDetails(String experienceText) {
+//        List<ExperienceDTO> experienceList = new ArrayList<>();
+//        if (experienceText == null || experienceText.isEmpty()) {
+//            return experienceList;
+//        }
+//
+//        String[] lines = experienceText.split("\\r?\\n");
+//        ExperienceDTO currentExp = new ExperienceDTO();
+//
+//        for (String line : lines) {
+//            String lowerLine = line.toLowerCase();
+//            if (lowerLine.trim().isEmpty())
+//                continue;
+//
+//            boolean hasDate = lowerLine.matches(".*(201\\d|202\\d).*[-–—to]+.*(201\\d|202\\d|present|current).*");
+//
+//            boolean hasRole = lowerLine.matches(".*\\b(intern|developer|engineer|manager|analyst|coder|specialist|associate|lead|executive|architect|consultant|officer)\\b.*");
+//
+//            boolean isNewEntry = (hasDate && currentExp.getDuration() != null);
+//
+//            if (isNewEntry && (currentExp.getRole() != null || currentExp.getCompany() != null)) {
+//                addExperienceSafely(experienceList, currentExp);
+//                currentExp = new ExperienceDTO();
+//            }
+//
+//            if (hasDate) {
+//                currentExp.setDuration(line.trim());
+//                if (lowerLine.contains("present") || lowerLine.contains("current")) {
+//                    currentExp.setCurrentJob(true);
+//                }
+//
+//                if (currentExp.getCompany() == null) {
+//                    // Match date with optional day of month, e.g. "16 Aug"
+//                    String companyGuess = line.replaceAll(
+//                            "(?i)\\b(\\d{1,2}(st|nd|rd|th)?\\s+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december|201\\d|202\\d)\\b.*$",
+//                            "").trim();
+//                    companyGuess = companyGuess.replaceAll("[-–—|(),]+$", "").trim();
+//                    if (!companyGuess.isEmpty() && companyGuess.length() < 50) {
+//                        currentExp.setCompany(companyGuess);
+//                    }
+//                }
+//            } else if (hasRole && currentExp.getRole() == null) {
+//                currentExp.setRole(line.trim());
+//            } else if (currentExp.getCompany() == null && line.trim().length() < 40 && !lowerLine.contains("project")) {
+//                if (!line.trim().endsWith(".") || lowerLine.contains("inc.") || lowerLine.contains("ltd.")) {
+//                    currentExp.setCompany(line.trim());
+//                }
+//            }
+//        }
+//
+//        if (currentExp.getRole() != null || currentExp.getCompany() != null) {
+//            addExperienceSafely(experienceList, currentExp);
+//        }
+//
+//        return experienceList;
+//    }
 
-        String[] lines = experienceText.split("\\r?\\n");
-        ExperienceDTO currentExp = new ExperienceDTO();
+//    private void addExperienceSafely(List<ExperienceDTO> list, ExperienceDTO exp) {
+//        if (exp.getCompany() == null || exp.getDuration() == null)
+//            return;
+//
+//        for (ExperienceDTO existing : list) {
+//            if (existing.getCompany().equals(exp.getCompany()) && existing.getDuration().equals(exp.getDuration())) {
+//                if (existing.getRole() == null && exp.getRole() != null) {
+//                    existing.setRole(exp.getRole());
+//                }
+//                return;
+//            }
+//        }
+//        list.add(exp);
+//    }
 
-        for (String line : lines) {
-            String lowerLine = line.toLowerCase();
-            if (lowerLine.trim().isEmpty())
-                continue;
-
-            boolean hasDate = lowerLine.matches(".*(201\\d|202\\d).*[-–—to]+.*(201\\d|202\\d|present|current).*");
-
-            boolean hasRole = lowerLine.matches(".*\\b(intern|developer|engineer|manager|analyst|coder|specialist|associate|lead|executive|architect|consultant|officer)\\b.*");
-
-            boolean isNewEntry = (hasDate && currentExp.getDuration() != null);
-
-            if (isNewEntry && (currentExp.getRole() != null || currentExp.getCompany() != null)) {
-                addExperienceSafely(experienceList, currentExp);
-                currentExp = new ExperienceDTO();
-            }
-
-            if (hasDate) {
-                currentExp.setDuration(line.trim());
-                if (lowerLine.contains("present") || lowerLine.contains("current")) {
-                    currentExp.setCurrentJob(true);
-                }
-
-                if (currentExp.getCompany() == null) {
-                    // Match date with optional day of month, e.g. "16 Aug"
-                    String companyGuess = line.replaceAll(
-                            "(?i)\\b(\\d{1,2}(st|nd|rd|th)?\\s+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december|201\\d|202\\d)\\b.*$",
-                            "").trim();
-                    companyGuess = companyGuess.replaceAll("[-–—|(),]+$", "").trim();
-                    if (!companyGuess.isEmpty() && companyGuess.length() < 50) {
-                        currentExp.setCompany(companyGuess);
-                    }
-                }
-            } else if (hasRole && currentExp.getRole() == null) {
-                currentExp.setRole(line.trim());
-            } else if (currentExp.getCompany() == null && line.trim().length() < 40 && !lowerLine.contains("project")) {
-                if (!line.trim().endsWith(".") || lowerLine.contains("inc.") || lowerLine.contains("ltd.")) {
-                    currentExp.setCompany(line.trim());
-                }
-            }
-        }
-
-        if (currentExp.getRole() != null || currentExp.getCompany() != null) {
-            addExperienceSafely(experienceList, currentExp);
-        }
-
-        return experienceList;
-    }
-
-    private void addExperienceSafely(List<ExperienceDTO> list, ExperienceDTO exp) {
-        if (exp.getCompany() == null || exp.getDuration() == null)
-            return;
-
-        for (ExperienceDTO existing : list) {
-            if (existing.getCompany().equals(exp.getCompany()) && existing.getDuration().equals(exp.getDuration())) {
-                if (existing.getRole() == null && exp.getRole() != null) {
-                    existing.setRole(exp.getRole());
-                }
-                return;
-            }
-        }
-        list.add(exp);
-    }
-
-    private double calculateTotalExperience(List<ExperienceDTO> experienceList) {
-        int totalMonths = 0;
-        int currentYear = java.time.Year.now().getValue();
-        int currentMonth = java.time.LocalDate.now().getMonthValue();
-
-        Map<String, Integer> monthMap = new HashMap<>();
-        monthMap.put("jan", 1);
-        monthMap.put("january", 1);
-        monthMap.put("feb", 2);
-        monthMap.put("february", 2);
-        monthMap.put("mar", 3);
-        monthMap.put("march", 3);
-        monthMap.put("apr", 4);
-        monthMap.put("april", 4);
-        monthMap.put("may", 5);
-        monthMap.put("jun", 6);
-        monthMap.put("june", 6);
-        monthMap.put("jul", 7);
-        monthMap.put("july", 7);
-        monthMap.put("aug", 8);
-        monthMap.put("august", 8);
-        monthMap.put("sep", 9);
-        monthMap.put("september", 9);
-        monthMap.put("oct", 10);
-        monthMap.put("october", 10);
-        monthMap.put("nov", 11);
-        monthMap.put("november", 11);
-        monthMap.put("dec", 12);
-        monthMap.put("december", 12);
-
-        for (ExperienceDTO exp : experienceList) {
-            String duration = exp.getDuration();
-            if (duration == null)
-                continue;
-            String lowerDur = duration.toLowerCase();
-
-            Matcher yearMatcher = Pattern.compile("(19|20)\\d{2}").matcher(duration);
-            List<Integer> years = new ArrayList<>();
-            while (yearMatcher.find()) {
-                years.add(Integer.parseInt(yearMatcher.group()));
-            }
-
-            Matcher monthMatcher = Pattern.compile(
-                    "\\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|october|oct|november|nov|december|dec)\\b")
-                    .matcher(lowerDur);
-            List<Integer> months = new ArrayList<>();
-            while (monthMatcher.find()) {
-                months.add(monthMap.get(monthMatcher.group()));
-            }
-
-            if (years.size() >= 2) {
-                int startYear = years.get(0);
-                int endYear = years.get(years.size() - 1);
-                int startMonth = months.size() > 0 ? months.get(0) : 1;
-                int endMonth = months.size() >= 2 ? months.get(months.size() - 1) : 12;
-
-                int monthsDiff = ((endYear - startYear) * 12) + (endMonth - startMonth) + 1;
-                totalMonths += Math.max(1, monthsDiff);
-            } else if (years.size() == 1 && exp.isCurrentJob()) {
-                int startYear = years.get(0);
-                int startMonth = months.size() > 0 ? months.get(0) : 1;
-
-                int monthsDiff = ((currentYear - startYear) * 12) + (currentMonth - startMonth) + 1;
-                totalMonths += Math.max(1, monthsDiff);
-            } else if (years.size() == 1) {
-                totalMonths += 12;
-            }
-        }
-
-        double exactYears = totalMonths / 12.0;
-        return Math.round(exactYears * 10.0) / 10.0;
-    }
+//    private double calculateTotalExperience(List<ExperienceDTO> experienceList) {
+//        int totalMonths = 0;
+//        int currentYear = java.time.Year.now().getValue();
+//        int currentMonth = java.time.LocalDate.now().getMonthValue();
+//
+//        Map<String, Integer> monthMap = new HashMap<>();
+//        monthMap.put("jan", 1);
+//        monthMap.put("january", 1);
+//        monthMap.put("feb", 2);
+//        monthMap.put("february", 2);
+//        monthMap.put("mar", 3);
+//        monthMap.put("march", 3);
+//        monthMap.put("apr", 4);
+//        monthMap.put("april", 4);
+//        monthMap.put("may", 5);
+//        monthMap.put("jun", 6);
+//        monthMap.put("june", 6);
+//        monthMap.put("jul", 7);
+//        monthMap.put("july", 7);
+//        monthMap.put("aug", 8);
+//        monthMap.put("august", 8);
+//        monthMap.put("sep", 9);
+//        monthMap.put("september", 9);
+//        monthMap.put("oct", 10);
+//        monthMap.put("october", 10);
+//        monthMap.put("nov", 11);
+//        monthMap.put("november", 11);
+//        monthMap.put("dec", 12);
+//        monthMap.put("december", 12);
+//
+//        for (ExperienceDTO exp : experienceList) {
+//            String duration = exp.getDuration();
+//            if (duration == null)
+//                continue;
+//            String lowerDur = duration.toLowerCase();
+//
+//            Matcher yearMatcher = Pattern.compile("(19|20)\\d{2}").matcher(duration);
+//            List<Integer> years = new ArrayList<>();
+//            while (yearMatcher.find()) {
+//                years.add(Integer.parseInt(yearMatcher.group()));
+//            }
+//
+//            Matcher monthMatcher = Pattern.compile(
+//                    "\\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|october|oct|november|nov|december|dec)\\b")
+//                    .matcher(lowerDur);
+//            List<Integer> months = new ArrayList<>();
+//            while (monthMatcher.find()) {
+//                months.add(monthMap.get(monthMatcher.group()));
+//            }
+//
+//            if (years.size() >= 2) {
+//                int startYear = years.get(0);
+//                int endYear = years.get(years.size() - 1);
+//                int startMonth = months.size() > 0 ? months.get(0) : 1;
+//                int endMonth = months.size() >= 2 ? months.get(months.size() - 1) : 12;
+//
+//                int monthsDiff = ((endYear - startYear) * 12) + (endMonth - startMonth) + 1;
+//                totalMonths += Math.max(1, monthsDiff);
+//            } else if (years.size() == 1 && exp.isCurrentJob()) {
+//                int startYear = years.get(0);
+//                int startMonth = months.size() > 0 ? months.get(0) : 1;
+//
+//                int monthsDiff = ((currentYear - startYear) * 12) + (currentMonth - startMonth) + 1;
+//                totalMonths += Math.max(1, monthsDiff);
+//            } else if (years.size() == 1) {
+//                totalMonths += 12;
+//            }
+//        }
+//
+//        double exactYears = totalMonths / 12.0;
+//        return Math.round(exactYears * 10.0) / 10.0;
+//    }
     private List<ProjectDTO> extractProjectsDetails(String projectsText) {
         List<ProjectDTO> projectList = new ArrayList<>();
         if (projectsText == null || projectsText.isEmpty()) {

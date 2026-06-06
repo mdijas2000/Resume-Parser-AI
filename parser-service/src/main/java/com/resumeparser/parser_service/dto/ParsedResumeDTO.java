@@ -11,6 +11,7 @@ public class ParsedResumeDTO {
 	private String email;
 	private String phnNo;
 	private String name;
+	private String summary;
 	private List<String> skills;
 	private List<EducationDTO> education;
 	private List<ExperienceDTO> experience;
