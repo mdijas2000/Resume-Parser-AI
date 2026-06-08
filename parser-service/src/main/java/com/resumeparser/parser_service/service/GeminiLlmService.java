@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +29,8 @@ public class GeminiLlmService {
 	@Value("${gemini.api.key}")
 	private String apiKey;
 	
-	public ParsedResumeDTO parseResumeWithLlm(MultipartFile file) {
+	@Async
+	public CompletableFuture<ParsedResumeDTO> parseResumeWithLlm(MultipartFile file) {
 		
 		Tika tika=new Tika();
 		String rawText;
@@ -91,7 +94,7 @@ public class GeminiLlmService {
 			double realTotalExp = calculateTotalExperience(parsedResume.getExperience());
 			parsedResume.setTotalExperience(realTotalExp);
 			
-			return parsedResume;
+			return CompletableFuture.completedFuture(parsedResume);
 			
 		}catch(Exception e) {
 			throw new RuntimeException("Failed to parse LLM response",e);

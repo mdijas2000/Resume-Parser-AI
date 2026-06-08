@@ -1,5 +1,7 @@
 package com.resumeparser.parser_service.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,19 +29,19 @@ public class ResumeParserController {
 //		return ResponseEntity.ok(result);
 //	}
 	@PostMapping("/upload")
-	public ResponseEntity<ParsedResumeDTO> parseResumeLLM(@RequestParam("file") MultipartFile file) {
-		try {
+	public CompletableFuture<ResponseEntity<ParsedResumeDTO>> parseResumeLLM(@RequestParam("file") MultipartFile file) {
 			System.out.println("Attempting AI parsing...");
-			ParsedResumeDTO aiResult=geminiLlmService.parseResumeWithLlm(file);
-			return ResponseEntity.ok(aiResult);
-		}catch (Exception e) {
-			System.out.println("AI parsing failed! Falling back to Regex Parser.Error "+e.getMessage());
-			ParsedResumeDTO regexResult=resumeParserService.parseResume(file);
-			
-			regexResult.setSummary("AI service is temporarily unavailable. Data parsed via standard texxt extraction.");
-			
-			return ResponseEntity.ok(regexResult);
-		}
-		
+			return geminiLlmService.parseResumeWithLlm(file)
+					.thenApply(aiResult->{
+						return ResponseEntity.ok(aiResult);
+					})
+					.exceptionally(e->{
+						System.out.println("AI parsing failed! Falling back to Regex Parser.Error "+e.getMessage());
+						ParsedResumeDTO regexResult=resumeParserService.parseResume(file);
+						
+						regexResult.setSummary("AI service is temporarily unavailable. Data parsed via standard texxt extraction.");
+						
+						return ResponseEntity.ok(regexResult);
+					});
 	}
 }
